@@ -6,21 +6,14 @@ import android.os.Handler
 import android.os.Looper
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.testapp.databinding.ItemGridBinding
-import com.testapp.model.GridItems
+import com.testapp.model.DataItem
 import kotlin.random.Random
 
-class GridAdapter(val cont: Int) : BaseAdapter<GridItems, GridAdapter.GridViewHolder>() {
+class PersonAdapter() : BaseAdapter<DataItem, PersonAdapter.GridViewHolder>() {
 
     lateinit var context: Context
-
-    init {
-        for (n in 1..cont) {
-            dataList.add(GridItems())
-        }
-    }
 
     inner class GridViewHolder(val binding: ItemGridBinding) :
         RecyclerView.ViewHolder(binding.root) {
@@ -45,14 +38,6 @@ class GridAdapter(val cont: Int) : BaseAdapter<GridItems, GridAdapter.GridViewHo
                 }
             }
         }
-    }
-
-    fun isWonTheGame() {
-        val filteredItem = dataList.filter { it.color != Color.BLUE }
-        if (filteredItem.isEmpty()) {
-            Toast.makeText(context, "You won the Game", Toast.LENGTH_LONG).show()
-        }
-
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): GridViewHolder {

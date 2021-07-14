@@ -1,4 +1,4 @@
-package com.testapp
+package com.testapp.model
 
 import android.graphics.Color
 
