@@ -22,6 +22,7 @@ import retrofit2.Response
  */
 class SecondFragment : Fragment() {
 
+    private lateinit var paginationListener: PaginationListener
     private lateinit var personAdapter: PersonAdapter
     private var _binding: FragmentSecondBinding? = null
 
@@ -47,21 +48,34 @@ class SecondFragment : Fragment() {
             val linearLayoutManager = LinearLayoutManager(requireContext())
             layoutManager = linearLayoutManager
             this.adapter = personAdapter
-            addOnScrollListener(object : PaginationListener(linearLayoutManager) {
+            paginationListener = object : PaginationListener(linearLayoutManager) {
                 override fun onLoadMore(page: Int, totalItemsCount: Int, view: RecyclerView) {
                     getUsers(page)
                 }
-            })
+            }
+            addOnScrollListener(paginationListener)
+        }
+
+        binding.swipeRefresh.setOnRefreshListener {
+            resetScreen()
         }
 
         getUsers(1)
 
     }
 
+    private fun resetScreen() {
+        paginationListener.resetState()
+        getUsers(1)
+        personAdapter.clear()
+    }
+
     private fun getUsers(page: Int) {
+        binding.swipeRefresh.isRefreshing = true
         val getsuperHeroes = RetrofitClient.getMyApi()?.getsuperHeroes(page)
         getsuperHeroes?.enqueue(object : Callback<UserResponse?> {
             override fun onResponse(call: Call<UserResponse?>, response: Response<UserResponse?>) {
+                binding.swipeRefresh.isRefreshing = false
                 if (response.isSuccessful) {
                     if (response.body() != null) {
                         if (::personAdapter.isInitialized) {
@@ -72,7 +86,7 @@ class SecondFragment : Fragment() {
             }
 
             override fun onFailure(call: Call<UserResponse?>, t: Throwable) {
-
+                binding.swipeRefresh.isRefreshing = false
             }
         })
     }
