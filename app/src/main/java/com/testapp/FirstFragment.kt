@@ -5,6 +5,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.GridLayoutManager
+import com.testapp.adapter.GridAdapter
 import com.testapp.databinding.FragmentFirstBinding
 
 /**
@@ -35,11 +38,33 @@ class FirstFragment : Fragment() {
 
         binding.btnSubmit.setOnClickListener {
             val input = binding.etInput.text.toString()
-
-            kotlin.math.sqrt(input.toDouble())
-
-            //findNavController().navigate(R.id.action_FirstFragment_to_SecondFragment)
+            val sqrt = getSqrt(input.toInt())
+            setAdapter(sqrt)
         }
+
+        binding.fab.setOnClickListener {
+            findNavController().navigate(R.id.action_FirstFragment_to_SecondFragment)
+        }
+    }
+
+    private fun setAdapter(spanCount: Int) {
+        with(binding.recyclerView) {
+            val adapter = GridAdapter(spanCount * spanCount)
+            layoutManager = GridLayoutManager(requireContext(), spanCount)
+            this.adapter = adapter
+        }
+
+    }
+
+    fun getSqrt(num: Int): Int {
+        var t: Int
+        var sqrt: Int = num / 2
+        do {
+            t = sqrt
+            sqrt = (t + (num / t)) / 2
+
+        } while ((t - sqrt) != 0)
+        return sqrt
     }
 
     override fun onDestroyView() {
