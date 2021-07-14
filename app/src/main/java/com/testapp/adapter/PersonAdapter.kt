@@ -1,52 +1,35 @@
 package com.testapp.adapter
 
 import android.content.Context
-import android.graphics.Color
-import android.os.Handler
-import android.os.Looper
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.testapp.databinding.ItemGridBinding
+import com.testapp.databinding.ItemPersonBinding
 import com.testapp.model.DataItem
-import kotlin.random.Random
 
-class PersonAdapter() : BaseAdapter<DataItem, PersonAdapter.GridViewHolder>() {
+class PersonAdapter : BaseAdapter<DataItem?, PersonAdapter.PersonViewHolder>() {
 
     lateinit var context: Context
 
-    inner class GridViewHolder(val binding: ItemGridBinding) :
+    inner class PersonViewHolder(val binding: ItemPersonBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        fun onBind(gridItems: GridItems) {
-            binding.cardView.setBackgroundColor(gridItems.color)
-            if (gridItems.color == Color.WHITE) {
-                val nextInt = Random(5).nextInt()
-                Handler(Looper.getMainLooper())
-                    .postDelayed({
-                        gridItems.color = Color.RED
-                        update(adapterPosition, gridItems)
-                    }, (nextInt * 1000).toLong())
-            } else if (gridItems.color == Color.RED) {
-                binding.cardView.setOnClickListener {
-                    gridItems.color = Color.BLUE
-                    update(adapterPosition, gridItems)
-                }
-            } else if (gridItems.color == Color.BLUE) {
-                binding.cardView.setOnClickListener {
-                    isWonTheGame()
-                }
+        fun onBind(dataItem: DataItem?) {
+            dataItem?.let {
+                binding.dataItem = dataItem
             }
+
+            binding.executePendingBindings()
         }
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): GridViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PersonViewHolder {
         context = parent.context
-        val binding = ItemGridBinding.inflate(LayoutInflater.from(context), parent, false)
-        return GridViewHolder(binding)
+        val binding = ItemPersonBinding.inflate(LayoutInflater.from(context), parent, false)
+        return PersonViewHolder(binding)
     }
 
-    override fun onBindViewHolder(holder: GridViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: PersonViewHolder, position: Int) {
         holder.onBind(dataList[position])
     }
 

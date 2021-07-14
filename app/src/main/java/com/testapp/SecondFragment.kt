@@ -9,8 +9,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.testapp.adapter.PersonAdapter
 import com.testapp.databinding.FragmentSecondBinding
+import com.testapp.model.DataItem
 import com.testapp.model.UserResponse
 import com.testapp.nw.RetrofitClient
+import com.testapp.utils.PaginationListener
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -42,15 +44,12 @@ class SecondFragment : Fragment() {
 
         with(binding.recyclerView) {
             personAdapter = PersonAdapter()
-            layoutManager = LinearLayoutManager(requireContext())
+            val linearLayoutManager = LinearLayoutManager(requireContext())
+            layoutManager = linearLayoutManager
             this.adapter = personAdapter
-            addOnScrollListener(object : RecyclerView.OnScrollListener() {
-                override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-                    super.onScrollStateChanged(recyclerView, newState)
-                }
-
-                override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                    super.onScrolled(recyclerView, dx, dy)
+            addOnScrollListener(object : PaginationListener(linearLayoutManager) {
+                override fun onLoadMore(page: Int, totalItemsCount: Int, view: RecyclerView) {
+                    getUsers(page)
                 }
             })
         }
@@ -63,8 +62,12 @@ class SecondFragment : Fragment() {
         val getsuperHeroes = RetrofitClient.getMyApi()?.getsuperHeroes(page)
         getsuperHeroes?.enqueue(object : Callback<UserResponse?> {
             override fun onResponse(call: Call<UserResponse?>, response: Response<UserResponse?>) {
-                if (::personAdapter.isInitialized) {
-                    personAdapter.addAll(response.body().data)
+                if (response.isSuccessful) {
+                    if (response.body() != null) {
+                        if (::personAdapter.isInitialized) {
+                            personAdapter.addAll(response.body()?.data ?: emptyList<DataItem>())
+                        }
+                    }
                 }
             }
 
